@@ -7,52 +7,65 @@
 <title>Floresta Digital &middot; Edi&ccedil;&otilde;es</title>
 <meta name="description" content="Arquivo das edi&ccedil;&otilde;es da Floresta Digital, newsletter di&aacute;ria de an&aacute;lise da geopol&iacute;tica da agenda digital com foco no Sul Global.">
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+  :root{
+    --bg:#ffffff; --bg-alt:#f7f7f5; --text:#1a1a1a; --text-2:#555555; --muted:#888888;
+    --accent:#2d5a2d; --accent-light:#4a8a4a; --border:#e0e0e0; --border-dark:#cccccc;
+  }
   html{scroll-behavior:smooth}
-  body{margin:0;padding:0;background:#F5F2EC}
+  body{margin:0;padding:0;background:var(--bg);font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:var(--text)}
   p{margin:0}
-  a{color:#1A3A5C}
-  .wrap{max-width:800px;margin:0 auto;padding:40px 28px 60px}
-  .ed{display:grid;grid-template-columns:52px 1fr;gap:14px;align-items:start;
-      border-bottom:1pt solid #C8C2B8;padding:14px 0;text-decoration:none}
-  .ed:hover{background:#FBFAF7}
-  .ed .num{font-family:Georgia,serif;font-size:17pt;color:#A8D5AA;text-align:right;line-height:1.1}
-  .ed:hover .num{color:#2E7D32}
-  .ed .dat{font-size:7.5pt;font-family:"Courier New",monospace;color:#9E9790;
-           letter-spacing:1.2pt;text-transform:uppercase;margin-bottom:4px}
-  .ed .tit{font-size:10pt;font-family:Arial,sans-serif;color:#2E2B28;line-height:1.55}
-  @media(max-width:520px){.ed{grid-template-columns:40px 1fr;gap:10px}.ed .num{font-size:14pt}}
+  a{color:var(--accent)}
+  .wrap{max-width:680px;margin:0 auto;padding:48px 24px 60px}
+  .site-header{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;
+      padding-bottom:20px;border-bottom:1px solid var(--border)}
+  .logo{font-size:22px;font-weight:700;letter-spacing:-.01em;margin-bottom:5px}
+  .logo span{color:var(--accent)}
+  .home-link{font-size:11px;color:var(--accent);text-decoration:none}
+  .edition-count{text-align:right;font-size:11px;color:var(--muted);text-transform:uppercase;
+      letter-spacing:.1em;font-weight:500;line-height:1.7;padding-top:3px}
+  .tagline{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.15em;margin:20px 0 0}
+  .eyebrow{font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:.2em;font-weight:600;margin-bottom:14px}
+  .archive-intro{font-size:15.5px;color:var(--text-2);line-height:1.85}
+  .divider{border-bottom:1px solid var(--border);margin:30px 0 32px}
+  .list-eyebrow{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.15em;font-weight:600;margin-bottom:8px}
+  .ed{display:flex;gap:18px;text-decoration:none;padding:18px 0;border-bottom:1px solid var(--border)}
+  .ed:first-of-type{padding-top:6px}
+  .ed:hover .tit{color:var(--accent)}
+  .ed .num{flex:0 0 34px;font-size:20px;font-weight:700;color:var(--border-dark);line-height:1.5}
+  .ed:hover .num{color:var(--accent-light)}
+  .ed .dat{font-size:11px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px}
+  .ed .tit{font-size:14px;color:var(--text-2);line-height:1.6}
+  .site-footer{font-size:11.5px;color:var(--muted);line-height:1.9;margin-top:36px;padding-top:20px;
+      border-top:1px solid var(--border);text-align:center}
+  @media(max-width:520px){.ed{gap:12px}.ed .num{flex-basis:26px;font-size:16px}}
 </style>
 </head>
-<body style="background:#F5F2EC">
+<body>
 <div class="wrap">
 
   <!-- Cabecalho, mesma composicao do topo da newsletter -->
-  <div style="display:grid;grid-template-columns:1fr auto;align-items:end;gap:12px">
+  <div class="site-header">
     <div>
-      <p style="font-size:7pt;font-family:'Courier New',monospace;color:#2E7D32;text-transform:uppercase;letter-spacing:2.4pt;margin-bottom:6px">Clipping Di&aacute;rio</p>
-      <h1 style="margin:0 0 6px;font-family:Georgia,serif;font-size:clamp(22px,4vw,34px);line-height:1;letter-spacing:-.5px">
-        <span style="color:#0F0E0C">Floresta </span><span style="color:#2E7D32">Digital</span>
-      </h1>
-      <a href="http://florestadigital.tec.br" style="text-decoration:none"><span style="font-size:8.5pt;font-family:'Courier New',monospace;color:#7AB47A;letter-spacing:.5pt">florestadigital.tec.br &#8599;</span></a>
+      <div class="logo">Floresta <span>Digital</span></div>
+      <a href="http://florestadigital.tec.br" class="home-link" target="_blank">florestadigital.tec.br &#8599;</a>
     </div>
-    <div style="text-align:right;padding-bottom:4px">
-      <p id="contagem" style="font-size:7.5pt;font-family:'Courier New',monospace;color:#9E9790;line-height:1.8"></p>
-    </div>
+    <div class="edition-count" id="contagem"></div>
   </div>
 
-  <div style="background:#1A3A5C;padding:7px 14px;margin:18px 0 24px">
-    <p style="font-size:7.5pt;font-family:'Courier New',monospace;color:#A8C4E0;text-transform:uppercase;letter-spacing:1.45pt">Geopol&iacute;tica da Agenda Digital &middot; Economia &middot; Regula&ccedil;&atilde;o &middot; Governan&ccedil;a</p>
+  <p class="tagline">Geopol&iacute;tica da Agenda Digital &middot; Economia &middot; Regula&ccedil;&atilde;o &middot; Governan&ccedil;a</p>
+
+  <div style="padding:26px 0 6px">
+    <p class="eyebrow">Arquivo</p>
+    <p class="archive-intro">An&aacute;lise di&aacute;ria da geopol&iacute;tica da agenda digital, com foco no Sul Global. Cada edi&ccedil;&atilde;o liga os pontos entre as not&iacute;cias do dia em geopol&iacute;tica, economia, regula&ccedil;&atilde;o, governan&ccedil;a e soberania digital.</p>
   </div>
 
-  <div style="border-left:4pt solid #1A3A5C;padding:2px 0 2px 20px;margin-bottom:30px">
-    <p style="font-size:7pt;font-family:'Courier New',monospace;color:#1A3A5C;text-transform:uppercase;letter-spacing:2pt;margin-bottom:8px">Arquivo</p>
-    <p style="font-size:10.5pt;font-family:Georgia,serif;color:#2E2B28;line-height:1.85">An&aacute;lise di&aacute;ria da geopol&iacute;tica da agenda digital, com foco no Sul Global. Cada edi&ccedil;&atilde;o liga os pontos entre as not&iacute;cias do dia em geopol&iacute;tica, economia, regula&ccedil;&atilde;o, governan&ccedil;a e soberania digital.</p>
-  </div>
+  <div class="divider"></div>
 
-  <p style="font-size:7pt;font-family:'Courier New',monospace;color:#9E9790;text-transform:uppercase;letter-spacing:2.4pt;margin-bottom:6px">Edi&ccedil;&otilde;es publicadas</p>
+  <p class="list-eyebrow">Edi&ccedil;&otilde;es publicadas</p>
   <div id="lista"></div>
 
-  <p style="font-size:7.5pt;font-family:'Courier New',monospace;color:#9E9790;line-height:1.9;margin-top:34px;text-align:center">
+  <p class="site-footer">
     Floresta Digital &middot; James Gorgen
   </p>
 
@@ -67,6 +80,7 @@
 // Mais recente em cima. A ordem da lista e a ordem exibida.
 // ═══════════════════════════════════════════════════════════════════════
 var EDS=[
+  {n:167, d:"31 ago 2026", t:"Trump renomeia o Lago Ontário para \"Lake America\" e o Google Maps obedece, a Austrália propõe direito ao esquecimento no mesmo dia em que a UE classifica o ChatGPT como buscador de grande porte, Sony e Warner processam a Anthropic por pirataria musical em massa, e uma nova corrida por chips põe Trump, Jensen Huang, o Vietnã e a China em rota de colisão"},
   {n:166, d:"30 ago 2026", t:"China transforma dados em ativo econômico central, chegando a 67,8 trilhões de yuan, a ministra Esther Dweck defende soberania digital sem isolamento e a ANPD marca limites às big techs, e a Anthropic fecha US$ 45 bilhões com a Nscale em meio ao debate sobre a bolha da Nvidia"},
   {n:165, d:"28 ago 2026", t:"Mais de cem empresas de tecnologia lideradas pela OpenAI assinam carta pedindo ação coordenada contra ataques cibernéticos turbinados por IA, dias depois de agentes da própria empresa romperem um ambiente de teste para invadir a Hugging Face, a Alibaba Cloud estreia no Brasil com dois data centers, e o Exército brasileiro cria com a Edge Group o primeiro centro de excelência em defesa cibernética da América Latina"},
   {n:164, d:"27 ago 2026", t:"Lula processa o Discord e multa o TikTok no mesmo dia em que o TSE aplica a tese de André Mendonça sobre deepfake, o Brasil avança a Redata e o Plano de Inclusão Digital no Senado, e a Nvidia bate recorde de receita mesmo sob restrições à China"},
@@ -109,7 +123,7 @@ var EDS=[
 (function(){
   var lista=document.getElementById("lista");
   if(!EDS.length){
-    lista.innerHTML='<p style="font-size:10pt;font-family:Arial,sans-serif;color:#9E9790;padding:14px 0">Nenhuma edi&ccedil;&atilde;o publicada ainda.</p>';
+    lista.innerHTML='<p style="font-size:14px;color:#888888;padding:14px 0">Nenhuma edi&ccedil;&atilde;o publicada ainda.</p>';
     return;
   }
   var esc=function(s){
