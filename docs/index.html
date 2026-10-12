@@ -197,7 +197,7 @@ header{padding-right:170px;min-height:150px;justify-content:center}
     </section>
   </main>
 
-  <footer><strong>Fontes.</strong> Programa de Governo de Lula para o próximo mandato, da coligação PT, PSB, PV, PCdoB, PDT, PSOL e Rede (citado pela página, como p. 54), e Cadernos do Futuro do Brasil, "Brasil pronto para mais!", versão para editoração (citados pelo código do trecho, como C 212, porque essa versão ainda não tem paginação final). As respostas resumem o que os dois documentos afirmam e não verificam os dados de forma independente. Confira o trecho original antes de citar. <span style="font-family:var(--mono)">Versão 18 · web</span></footer>
+  <footer><strong>Fontes.</strong> Programa de Governo de Lula para o próximo mandato, da coligação PT, PSB, PV, PCdoB, PDT, PSOL e Rede (citado pela página, como p. 54), e Cadernos do Futuro do Brasil, "Brasil pronto para mais!", versão para editoração (citados pelo código do trecho, como C 212, porque essa versão ainda não tem paginação final). As respostas resumem o que os dois documentos afirmam e não verificam os dados de forma independente. Confira o trecho original antes de citar. <span style="font-family:var(--mono)">Versão 19 · web</span></footer>
 </div>
 
 <dialog id="dlg" aria-labelledby="dlg-t">
@@ -373,7 +373,7 @@ async function refine(f){
   const put = t => { curFmt = f; plain = true; target = el; renderAnswer(t); };
   btn.disabled = true; note(''); el.innerHTML = '<p class="note dots">Refazendo o texto</p>';
   try{
-    const res = await sample('Reescreva o texto abaixo, feito para ' + NAMES[f] + ', aplicando o ajuste pedido. Regras do formato. ' + SOCIAL[f] + ' Não acrescente fatos, números, datas ou nomes de programas que não estejam no texto original. Não cite fontes nem documentos e não inclua comentários, observações ou ressalvas. Não use dois-pontos para ligar frases. Responda apenas com o texto reescrito, em português do Brasil.\n\nAJUSTE PEDIDO\n' + inst.slice(0,600) + '\n\nTEXTO ORIGINAL\n' + prev);
+    const res = await sample('Reescreva o texto abaixo, feito para ' + NAMES[f] + ', aplicando o ajuste pedido. Regras do formato. ' + SOCIAL[f] + ' Não acrescente fatos, números, datas ou nomes de programas que não estejam no texto original. Não cite fontes nem documentos e não inclua comentários, observações ou ressalvas. Não use dois-pontos para ligar frases. Responda apenas com o texto reescrito, em português do Brasil.\n\nAJUSTE PEDIDO\n' + inst.slice(0,600) + '\n\nTEXTO ORIGINAL\n' + prev, 'post', {cache:false});
     const text = String(typeof res === 'string' ? res : res.text).trim();
     put(text || prev); inp.value = '';
   }catch(e){ put(prev); note('Não foi possível refazer este texto. Tente de novo em instantes.', true); }
@@ -398,31 +398,54 @@ function renderMulti(text, fmts, done){
   if(!any && done) parts[fmts[0]] = text;
   fmts.forEach(f => { const t = (parts[f] || '').trim(); if(!t) return; curFmt = f; plain = !!SOCIAL[f]; target = $('o-'+f).querySelector('.out-b'); renderAnswer(t); });
 }
+// Tema em forma canônica, para que perguntas escritas de modos diferentes reaproveitem a mesma ficha.
+function canon(q){ const w = words(q).filter(x => !STOP.has(x)); return (w.length ? [...new Set(w)].join(' ') : norm(q).replace(/\s+/g,' ').trim()).slice(0,120); }
+function fichaView(ficha, modo){
+  if(modo === 'ambos') return ficha;
+  const out = []; let keep = true;
+  ficha.split('\n').forEach(l => { if(/^#{1,4}\s/.test(l.trim())){ const n = norm(l); keep = modo === 'fez' ? /\bfez\b/.test(n) : /\bfara\b|proximo/.test(n); } if(keep) out.push(l); });
+  return out.join('\n');
+}
+function promptPosts(tema, modo, ficha, fmts){
+  const rec = modo==='fez' ? 'Trate apenas das entregas do atual mandato.' : modo==='fara' ? 'Trate apenas dos compromissos para o próximo mandato.' : 'Mostre primeiro o que já foi feito e depois o que está prometido para o próximo mandato, deixando clara a diferença. Se a ficha só trouxer uma das duas partes, escreva o texto apenas com a parte que existe e não mencione a outra.';
+  return 'Você redige conteúdo de redes sociais sobre o governo Lula a partir de uma ficha de fatos extraída do Programa de Governo de Lula para o próximo mandato e dos Cadernos do Futuro do Brasil. Use SOMENTE o que está na ficha. Não acrescente fatos, números, datas ou nomes de programas que não estejam nela, e não transforme compromisso em entrega.\n\n'
+  + 'Como ler a ficha. A seção "O que o governo fez" traz entregas do atual mandato. A seção "O que fará no próximo mandato" traz compromissos. Itens identificados como proposta dos Cadernos não entram nos textos. As marcações entre parênteses, como (p. 54) ou (C 212), são referências internas e não podem aparecer nos textos.\n\n'
+  + 'Escreva ' + fmts.length + (fmts.length > 1 ? ' textos independentes sobre o mesmo tema, um para cada formato descrito a seguir, na ordem dada' : ' texto, no formato descrito a seguir') + '. Antes de cada texto, escreva sozinha em uma linha a marca do formato exatamente como aparece (por exemplo ===' + MARK[fmts[0]] + '===). Não escreva nada antes da primeira marca nem comentários entre os textos. Cada texto deve ser pensado para o seu formato, e não uma adaptação mecânica do anterior. Em todos, português do Brasil, nenhum uso de dois-pontos para ligar frases, sem título e pronto para copiar e colar. Não comente lacunas, limites ou ausências das fontes. Somente se a ficha disser que as fontes não tratam do tema, escreva em cada texto apenas a frase As fontes não abordam este tema.\n\n'
+  + fmts.map(f => '===' + MARK[f] + '===\n' + SOCIAL[f] + ' ' + rec).join('\n\n')
+  + '\n\n' + ajustes() + 'TEMA\n' + tema + '\n\nFICHA DE FATOS\n' + ficha + LEMBRE;
+}
 async function answer(q){
   if(!sample) return;
   const my = ++seq;
   const modo = document.querySelector('input[name=modo]:checked').value;
   let fmts = [...document.querySelectorAll('input[name=fmt]:checked')].map(i => i.value);
   if(!fmts.length){ $('p-analise').checked = true; fmts = ['analise']; }
-  const multi = fmts.length > 1; let built = false;
-  const show = (text, done) => { if(multi) renderMulti(text, fmts, done); else { curFmt = fmts[0]; plain = !!SOCIAL[curFmt]; target = $('o-'+curFmt).querySelector('.out-b'); renderAnswer(text); } };
+  const social = fmts.filter(f => SOCIAL[f]); let built = false;
   const finish = () => { fmts.forEach(f => { $('o-'+f).querySelector('.cp').hidden = !raws[f]; addRefine(f); }); document.querySelectorAll('#ans .out-b > .note').forEach(n => { n.className = 'note'; n.textContent = 'Não gerado.'; }); };
   note(''); $('copy').hidden = true; $('go').disabled = true; raws = {}; target = null;
   $('ans').innerHTML = '<p class="note dots">Ampliando a busca</p>';
+  const tema = canon(q);
   try{
     let r = search(q);
     try{
-      const t = await sample('Responda apenas com um array JSON de até 12 strings curtas. São termos, sinônimos, siglas e nomes de programas federais que um programa de governo brasileiro de 2026 usaria ao tratar do tema a seguir. Exemplo: ["conectividade","banda larga","FUST"]\n\nTema: '+q, 'quick');
+      const t = await sample('Responda apenas com um array JSON de até 12 strings curtas. São termos, sinônimos, siglas e nomes de programas federais que um programa de governo brasileiro de 2026 usaria ao tratar do tema a seguir. Exemplo: ["conectividade","banda larga","FUST"]\n\nTema: '+tema, 'quick');
       const m = String(t).match(/\[[\s\S]*\]/); const ex = m && JSON.parse(m[0]);
       if(Array.isArray(ex)){ r = search(q, ex.slice(0,12)); if(my===seq) renderHits(r, q); }
     }catch(_){}
     if(my!==seq) return;
     if(!r.hits.length){ idle('As fontes não trazem trechos sobre este tema. Tente outra formulação.'); return; }
-    $('ans').innerHTML = fmts.map(f => '<div class="out" id="o-'+f+'"><div class="out-h"><strong>'+ico(f)+NAMES[f]+'</strong><button type="button" class="ghost cp" data-k="'+f+'" hidden>Copiar</button></div><div class="out-b"><p class="note dots">Lendo '+r.hits.length+' trechos e redigindo</p></div></div>').join(''); built = true;
-    const pr = multi ? promptMulti(q, modo, r.hits, fmts) : prompt(q, modo, r.hits, fmts[0]);
-    const text = await sample(pr);
+    $('ans').innerHTML = fmts.map(f => '<div class="out" id="o-'+f+'"><div class="out-h"><strong>'+ico(f)+NAMES[f]+'</strong><button type="button" class="ghost cp" data-k="'+f+'" hidden>Copiar</button></div><div class="out-b"><p class="note dots">'+(f==='analise' ? 'Lendo '+r.hits.length+' trechos' : 'Preparando o texto')+'</p></div></div>').join(''); built = true;
+    // Etapa 1: ficha de fatos do tema (uma por tema, reaproveitada pelo serviço).
+    const ficha = String(await sample(prompt(tema, 'ambos', r.hits, 'analise'), 'default'));
     if(my!==seq) return;
-    show(String(text), true); finish();
+    if(fmts.includes('analise')){ curFmt = 'analise'; plain = false; target = $('o-analise').querySelector('.out-b'); renderAnswer(fichaView(ficha, modo)); $('o-analise').querySelector('.cp').hidden = false; }
+    // Etapa 2: textos para as redes, escritos a partir da ficha.
+    if(social.length){
+      const text = String(await sample(promptPosts(tema, modo, ficha, social), 'post', {slot: Math.floor(Math.random()*4)}));
+      if(my!==seq) return;
+      renderMulti(text, social, true);
+    }
+    finish();
   }catch(e){
     if(my===seq){
       if(!built) idle('Não foi possível gerar a resposta.', true); else finish();
@@ -501,8 +524,8 @@ $('dlg').addEventListener('click', e => { if(e.target === $('dlg')) $('dlg').clo
 let ready = false, pending = null;
 run($('q').value, false);
 const PROXY = (window.LULA_PROXY || '').trim();
-sample = /^https:\/\//.test(PROXY) ? (async (p, tier) => {
-  const r = await fetch(PROXY, {method:'POST', headers:{'content-type':'application/json'}, body: JSON.stringify({prompt:p, tier: tier || 'default'})});
+sample = /^https:\/\//.test(PROXY) ? (async (p, tier, o) => {
+  const r = await fetch(PROXY, {method:'POST', headers:{'content-type':'application/json'}, body: JSON.stringify(Object.assign({prompt:p, tier: tier || 'default'}, o || {}))});
   const j = await r.json().catch(() => ({}));
   if(!r.ok || typeof j.text !== 'string'){ const e = new Error(j.error || 'falha'); e.code = j.error || 'falha'; throw e; }
   return j.text;
